@@ -302,7 +302,8 @@ describe Sidekiq::Throttler::RateLimit do
 
       it 'calls the exceeded callback with the configured #period' do
         callback = Proc.new {}
-        expect(callback).to receive(:call).with(rate_limit.period)
+        max_scheduled = (rate_limit.period * 2).to_i + 30
+        expect(callback).to receive(:call).with(be_within(max_scheduled).of(rate_limit.period))
 
         rate_limit.exceeded(&callback)
         rate_limit.execute

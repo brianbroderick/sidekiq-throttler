@@ -24,6 +24,14 @@ describe Sidekiq::Throttler do
     'default'
   end
 
+  let(:payload) do
+    ['world']
+  end
+
+  subject(:rate_limit) do
+    Sidekiq::Throttler::RateLimit.new(worker, payload, 'meow')
+  end
+
   describe '#call' do
 
     it 'instantiates a rate limit with the worker, args, and queue' do
@@ -46,8 +54,10 @@ describe Sidekiq::Throttler do
     context 'when rate limit is exceeded' do
 
       it 'requeues the job with a delay' do
+        max_scheduled = (rate_limit.period * 2).to_i + 30
+
         expect_any_instance_of(Sidekiq::Throttler::RateLimit).to receive(:exceeded?).and_return(true)
-        expect(worker.class).to receive(:perform_in).with(1.minute, *message['args'])
+        expect(worker.class).to receive(:perform_in).with(be_within(max_scheduled).of(rate_limit.period), *message['args'])
         throttler.call(worker, message, queue)
       end
     end

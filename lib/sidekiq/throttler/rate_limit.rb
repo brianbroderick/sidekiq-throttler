@@ -145,11 +145,17 @@ module Sidekiq
         return @within_bounds.call unless can_throttle?
 
         if exceeded?
-          @exceeded.call(period)
+          @exceeded.call(scheduled_out_seconds(period))
         else
           increment
           @within_bounds.call
         end
+      end
+
+      ##
+      # Determine how long out to schedule jobs that have exceeded the threshold
+      def scheduled_out_seconds(period)
+        (period * (1 + rand)).to_i + (rand(30) * 1)
       end
 
       ##
