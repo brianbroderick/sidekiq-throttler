@@ -9,9 +9,9 @@ branches:
   only:
     - master
 notifications:
-  email:
-    recipients:
-      - gabe@ga.be
+  email: false
 gemfile:
   - gemfiles/sidekiq_2.gemfile
+  - gemfiles/sidekiq_3.gemfile
+  - gemfiles/sidekiq_4.gemfile
   - gemfiles/sidekiq_master.gemfile
