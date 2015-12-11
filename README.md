@@ -9,7 +9,7 @@ limit job execution on a per-worker basis.
 
 ## Compatibility
 
-Sidekiq::Throttler supports Sidekiq versions 2 and 3 and is actively tested against Ruby versions 2.0.0, 2.1, and 2.2.
+Sidekiq::Throttler supports Sidekiq versions 2, 3, and 4 and is actively tested against Ruby versions 2.0.0, 2.1, and 2.2.
 
 ## Installation
 
