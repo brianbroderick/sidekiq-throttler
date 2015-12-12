@@ -38,7 +38,7 @@ module Sidekiq
           # We compare popped values to account for race conditions,
           # pushing them back if they don't match.
           Sidekiq.redis do |conn|
-            prune_one = ->(timestamp) {
+            prune_one = lambda do |timestamp|
               if timestamp && timestamp.to_i <= cutoff.to_i
                 last = conn.rpop(namespace_key(key))
                 if last == timestamp
@@ -48,7 +48,7 @@ module Sidekiq
                   nil
                 end
               end
-            }
+            end
 
             loop while prune_one.call(conn.lindex(namespace_key(key), -1))
           end
@@ -72,7 +72,7 @@ module Sidekiq
         # Clear all data from storage.
         def reset
           Sidekiq.redis do |conn|
-            conn.keys(namespace_key("*")).each do |key|
+            conn.keys(namespace_key('*')).each do |key|
               conn.del(key)
             end
           end

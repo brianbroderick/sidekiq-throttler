@@ -8,13 +8,13 @@ Gem::Specification.new do |gem|
   gem.version       = Sidekiq::Throttler::VERSION
   gem.authors       = ['Gabe Evans']
   gem.email         = ['gabe@ga.be']
-  gem.description   = %q{Sidekiq middleware that adds the ability to rate limit job execution.}
-  gem.summary       = %q{Sidekiq::Throttler is a middleware for Sidekiq that adds the ability to rate limit job execution on a per-worker basis.}
+  gem.description   = 'Sidekiq middleware that adds the ability to rate limit job execution.'
+  gem.summary       = 'Sidekiq::Throttler is a middleware for Sidekiq that adds the ability to rate limit job execution on a per-worker basis.'
   gem.homepage      = 'https://github.com/gevans/sidekiq-throttler'
   gem.license       = 'MIT'
 
-  gem.files         = `git ls-files`.split($/)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = %w(lib)
 

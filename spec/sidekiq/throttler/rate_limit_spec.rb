@@ -1,14 +1,13 @@
 require 'spec_helper'
 
-shared_examples "incrementing" do
+shared_examples 'incrementing' do
   it 'increments #count by one' do
     Timecop.freeze do
-      expect { rate_limit.increment }.to change{ rate_limit.count }.by(1)
+      expect { rate_limit.increment }.to change { rate_limit.count }.by(1)
     end
   end
 
   context 'when #period has passed' do
-
     it 'removes old increments' do
       rate_limit.options['period'] = 5
 
@@ -25,7 +24,6 @@ shared_examples "incrementing" do
 end
 
 describe Sidekiq::Throttler::RateLimit do
-
   let(:worker_class) do
     LolzWorker
   end
@@ -51,7 +49,6 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '.new' do
-
     it 'initializes with a provided worker' do
       expect(rate_limit.worker).to eq(worker)
     end
@@ -64,17 +61,16 @@ describe Sidekiq::Throttler::RateLimit do
       expect(rate_limit.queue).to eq('meow')
     end
 
-    context "with an invalid storage backend" do
-      it "raises an ArgumentError" do
-        expect {
+    context 'with an invalid storage backend' do
+      it 'raises an ArgumentError' do
+        expect do
           described_class.new(worker, payload, 'meow', storage: :blarg)
-        }.to raise_error(ArgumentError)
+        end.to raise_error(ArgumentError)
       end
     end
   end
 
   describe '#options' do
-
     it 'retrieves throttle options from the worker' do
       expect(worker_class.get_sidekiq_options).to receive(:[]).with('throttle')
       rate_limit.options
@@ -90,7 +86,6 @@ describe Sidekiq::Throttler::RateLimit do
     end
 
     context 'when the worker specifies no throttle options' do
-
       let(:worker_class) do
         Class.new do
           include Sidekiq::Worker
@@ -104,7 +99,6 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#threshold' do
-
     context 'when threshold is a Proc' do
       let(:worker_class) do
         ProcThresholdWorker
@@ -135,7 +129,6 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#period' do
-
     context 'when period is a Proc' do
       let(:worker_class) do
         ProcPeriodWorker
@@ -166,7 +159,6 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#key' do
-
     let(:worker_class) do
       CustomKeyWorker
     end
@@ -176,20 +168,18 @@ describe Sidekiq::Throttler::RateLimit do
     end
 
     context 'when key is a string' do
-
       it 'returns the key as a symbol' do
         expect(rate_limit.key).to eq('winning')
       end
     end
 
     context 'when key is a Proc' do
-
       let(:worker_class) do
         ProcWorker
       end
 
       let(:payload) do
-        ['wat', 'is', 'this']
+        %w(wat is this)
       end
 
       it 'returns the result of the called Proc' do
@@ -199,18 +189,14 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#can_throttle?' do
-
     context 'when options are correctly specified' do
-
       it 'returns true' do
         expect(rate_limit.can_throttle?).to be_truthy
       end
     end
 
     %w(threshold period).each do |method|
-
       context "when ##{method} is zero" do
-
         it 'returns false' do
           allow(rate_limit).to receive(method.to_sym).and_return(0)
           expect(rate_limit.can_throttle?).to be_falsey
@@ -220,9 +206,7 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#exceeded?' do
-
     context 'when #count is equal to #threshold' do
-
       it 'returns true' do
         expect(rate_limit).to receive(:count).and_return(rate_limit.threshold)
         expect(rate_limit).to be_exceeded
@@ -230,7 +214,6 @@ describe Sidekiq::Throttler::RateLimit do
     end
 
     context 'when #count is greater than #threshold' do
-
       it 'returns true' do
         expect(rate_limit).to receive(:count).and_return(rate_limit.threshold + 1)
         expect(rate_limit).to be_exceeded
@@ -238,7 +221,6 @@ describe Sidekiq::Throttler::RateLimit do
     end
 
     context 'when #count is less than #threshold' do
-
       it 'returns false' do
         expect(rate_limit).to receive(:count).and_return(0)
         expect(rate_limit).not_to be_exceeded
@@ -247,7 +229,6 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#within_bounds?' do
-
     it 'returns the opposite of #exceeded?' do
       expect(rate_limit).to receive(:exceeded?).and_return(true)
       expect(rate_limit).not_to be_within_bounds
@@ -257,29 +238,25 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#exceeded' do
-
     it 'accepts a block as a callback' do
       rate_limit.exceeded { 'rawr' }
     end
   end
 
   describe '#within_bounds' do
-
     it 'accepts a block as a callback' do
       rate_limit.within_bounds { 'grr' }
     end
   end
 
   describe '#execute' do
-
     context 'when rate limit cannot be throttled' do
-
       before do
         expect(rate_limit).to receive(:can_throttle?).and_return(false)
       end
 
       it 'calls the within bounds callback' do
-        callback = Proc.new {}
+        callback = proc {}
         expect(callback).to receive(:call)
 
         rate_limit.within_bounds(&callback)
@@ -295,13 +272,12 @@ describe Sidekiq::Throttler::RateLimit do
     end
 
     context 'when rate limit is exceeded' do
-
       before do
         expect(rate_limit).to receive(:exceeded?).and_return(true)
       end
 
       it 'calls the exceeded callback with the configured #period' do
-        callback = Proc.new {}
+        callback = proc {}
         max_scheduled = (rate_limit.period * 2).to_i + 30
         expect(callback).to receive(:call).with(be_within(max_scheduled).of(rate_limit.period))
 
@@ -311,7 +287,6 @@ describe Sidekiq::Throttler::RateLimit do
     end
 
     context 'when rate limit is within bounds' do
-
       it 'increments the counter' do
         rate_limit.within_bounds {}
 
@@ -320,7 +295,7 @@ describe Sidekiq::Throttler::RateLimit do
       end
 
       it 'calls the within bounds callback' do
-        callback = Proc.new {}
+        callback = proc {}
         expect(callback).to receive(:call)
 
         rate_limit.within_bounds(&callback)
@@ -330,9 +305,7 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#count' do
-
     context 'when no jobs have executed' do
-
       it 'returns 0' do
         expect(rate_limit.count).to be_zero
       end
@@ -340,14 +313,14 @@ describe Sidekiq::Throttler::RateLimit do
   end
 
   describe '#increment' do
-    include_examples "incrementing"
+    include_examples 'incrementing'
   end
 
-  context "with a :redis storage backend" do
+  context 'with a :redis storage backend' do
     subject(:rate_limit) do
       described_class.new(worker, payload, 'meow', storage: :redis)
     end
 
-    include_examples "incrementing"
+    include_examples 'incrementing'
   end
 end

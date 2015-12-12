@@ -6,13 +6,13 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
 end
 
-task :default => :spec
+task default: :spec
 
 require 'yard'
 YARD::Rake::YardocTask.new
 
 desc 'Start Pry with runtime dependencies loaded'
-task :console, :script do |t, args|
+task :console, :script do |_t, args|
   command  = 'bundle exec pry'
   command += "-r #{args[:script]}" if args[:script]
   sh command

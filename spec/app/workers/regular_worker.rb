@@ -1,7 +1,7 @@
 class RegularWorker
   include Sidekiq::Worker
 
-  def perform(name)
-    puts "..."
+  def perform(_name)
+    puts '...'
   end
 end

@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Sidekiq::Throttler do
-
   subject(:throttler) do
     described_class.new(options)
   end
@@ -33,7 +32,6 @@ describe Sidekiq::Throttler do
   end
 
   describe '#call' do
-
     it 'instantiates a rate limit with the worker, args, and queue' do
       expect(Sidekiq::Throttler::RateLimit).to receive(:new).with(
         worker, message['args'], queue, options
@@ -52,7 +50,6 @@ describe Sidekiq::Throttler do
     end
 
     context 'when rate limit is exceeded' do
-
       it 'requeues the job with a delay' do
         max_scheduled = (rate_limit.period * 2).to_i + 30
 

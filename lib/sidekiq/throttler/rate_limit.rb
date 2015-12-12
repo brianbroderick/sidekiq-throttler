@@ -7,7 +7,6 @@ module Sidekiq
     # executions so that "24 jobs every 1 hour" becomes "1 job every 2 minutes
     # and 30 seconds"
     class RateLimit
-
       ##
       # @return [Sidekiq::Worker]
       #   The worker to rate limit.
@@ -41,8 +40,8 @@ module Sidekiq
         @queue = queue
 
         unless @storage_class = lookup_storage(options.fetch(:storage, :memory))
-          raise ArgumentError,
-            "Unrecognized storage backend: #{options[:storage].inspect}"
+          fail ArgumentError,
+               "Unrecognized storage backend: #{options[:storage].inspect}"
         end
       end
 
@@ -91,9 +90,9 @@ module Sidekiq
       #   The key name used when storing counters for jobs.
       def key
         @key ||= if options['key']
-          options['key'].respond_to?(:call) ? options['key'].call(*payload) : options['key']
-        else
-          "#{@worker.class.to_s.underscore.gsub('/', ':')}:#{@queue}"
+                   options['key'].respond_to?(:call) ? options['key'].call(*payload) : options['key']
+                 else
+                   "#{@worker.class.to_s.underscore.tr('/', ':')}:#{@queue}"
         end
       end
 

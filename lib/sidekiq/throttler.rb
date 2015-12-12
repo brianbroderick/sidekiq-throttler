@@ -42,6 +42,5 @@ module Sidekiq
 
       rate_limit.execute
     end
-
   end # Throttler
 end # Sidekiq
