@@ -155,7 +155,10 @@ module Sidekiq
       ##
       # Determine how long out to schedule jobs that have exceeded the threshold
       def scheduled_out_seconds(period)
-        (period * (1 + rand)).to_i + (rand(30) * 1)
+        scheduled = (period * (1 + rand)).to_i + (rand(30) * 1)
+        puts "*" * 100
+        puts scheduled
+        scheduled
       end
 
       ##
